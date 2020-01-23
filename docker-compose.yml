@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: 'project-nginx-proxy'
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+  myampm:
+    build: 
+      context: ./php 
+    container_name: 'project-php-7.1.x-apache'
+    environment:
+      - VIRTUAL_HOST=project.local
+      - APACHE_LOG_DIR=/etc/apache2/logs
+    links:
+      - mysql
+    volumes:
+      - ./www/project:/var/www/html
+      - ./php/php.ini:/usr/local/etc/php/php.ini
+  mysql:
+    image: mysql:5.7
+    container_name: 'project-mysql-5.7'
+    environment:
+      MYSQL_ROOT_PASSWORD: qwerty
+    ports:
+      - 3306:3306
+    volumes:
+      - ./db/:/var/lib/mysql
